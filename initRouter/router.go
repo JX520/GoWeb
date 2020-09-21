@@ -2,9 +2,11 @@ package initRouter
 
 import (
 	"Goweb/handler"
-	"Goweb/middleware"
+	"Goweb/handler/article"
 	"Goweb/utils"
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 	"net/http"
 )
 
@@ -23,6 +25,9 @@ func SetRouter() *gin.Engine {
 	//}
 	router.Static("/statics","./statics")
 	router.StaticFS("/avatar", http.Dir(utils.RootPath() + "avatar/"))
+
+
+
 	// 请求"/"
 	index := router.Group("/")
 	{
@@ -34,21 +39,31 @@ func SetRouter() *gin.Engine {
 	}
 
 	// 请求"/user"
-	userRouter := router.Group("/user")
+	//userRouter := router.Group("/user")
+	//{
+	//	//userRouter.GET("/:name",handler.UserSave)
+	//	userRouter.GET("",handler.UserSaveByQuery)
+	//	userRouter.POST("/register",handler.UserRegister)
+	//	userRouter.POST("/login",handler.UserLogin)
+	//	userRouter.GET("/profile/",middleware.Auth(), handler.UserProfile)
+	//	userRouter.POST("/update",middleware.Auth(), handler.UpdateUserProfile)
+	//}
+
+	articleRouter := router.Group("")
 	{
-		//userRouter.GET("/:name",handler.UserSave)
-		userRouter.GET("",handler.UserSaveByQuery)
-		userRouter.POST("/register",handler.UserRegister)
-		userRouter.POST("/login",handler.UserLogin)
-		userRouter.GET("/profile/",middleware.Auth(), handler.UserProfile)
-		userRouter.POST("/update",middleware.Auth(), handler.UpdateUserProfile)
+		//通过id获取单条数据
+		articleRouter.GET("/article/:id", article.GetOne)
+		//获取全部数据
+		articleRouter.GET("/articles",article.GetAll)
+		//增加一条数据
+		articleRouter.POST("/article",article.Insert)
+		//删除一条数据
+		articleRouter.DELETE("/article/:id", article.DeleteOne)
 	}
 
-	//请求"/register"
-	//registerRouter := router.Group("/register")
-	//{
-	//	registerRouter.POST("/", handler.UserRegister)
-	//}
+	//url := ginSwagger.URL("http://localhost:8080/swagger/doc.json")
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+
 	return router
 }
 
